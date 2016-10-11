@@ -38,6 +38,16 @@
       (is (= (:expanded-all code) expansion))
       (is (= #{"done"} status))))
 
+  (testing "macroexpand-step expander works"
+    (letfn [(mstep [code]
+              (:expansion (session/message {:op "macroexpand"
+                                            :expander "macroexpand-step"
+                                            :code (:expr code)
+                                            :display-namespaces "none"})))]
+      (let [expansions (take 10 (iterate mstep (:expr code)))]
+        (is (= [(:expanded-1 code) (:expanded code)] (take 2 expansions)))
+        (is (= (:expanded-all code) (nth 9 expansions))))))
+
   (testing "macroexpand is the default expander"
     (let [{:keys [expansion status]} (session/message {:op "macroexpand"
                                                        :code (:expr code)
