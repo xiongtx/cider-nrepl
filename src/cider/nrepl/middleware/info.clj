@@ -145,7 +145,7 @@
       (when-let [m (cond (special-symbol? sym) (#'repl/special-doc sym)
                          (:special-form v) v)]
         (-> m
-            (assoc :name orig-sym)
+            (assoc :name (-> orig-sym name symbol))
             (assoc :url (if (contains? m :url)
                           (when (:url m)
                             (str "https://clojure.org/" (:url m)))
