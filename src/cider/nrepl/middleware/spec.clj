@@ -35,6 +35,24 @@
               sorted-specs)
       sorted-specs)))
 
+(defn spec-ns-list
+  "Return sorted list of all spec namespaces."
+  []
+  (->> (spec-utils/registry)
+       keys
+       (map namespace)
+       sort
+       dedupe))
+
+(defn specs-for-ns
+  "Return sorted list of specs for a given namespace.
+
+  E.g. for namespace :foo, return (:foo/a :foo/b :foo/c)."
+  [ns]
+  (->> (spec-utils/registry)
+       keys
+       (filter #(= (name ns) (namespace %)))
+       sort))
 
 (defn get-multi-spec-sub-specs
   "Given a multi-spec form, call its multi method methods to retrieve
@@ -89,6 +107,12 @@
 (defn spec-list-reply [msg]
   {:spec-list (spec-list (:filter-regex msg))})
 
+(defn spec-ns-list-reply [msg]
+  {:spec-ns-list (spec-ns-list)})
+
+(defn specs-for-ns-reply [msg]
+  {:specs-for-ns (specs-for-ns (:spec-ns msg))})
+
 (defn spec-form-reply [msg]
   {:spec-form (spec-form (:spec-name msg))})
 
@@ -100,6 +124,8 @@
   [handler]
   (with-safe-transport handler
     "spec-list" spec-list-reply
+    "spec-ns-list" spec-ns-list-reply
+    "specs-for-ns" specs-for-ns-reply
     "spec-form" spec-form-reply
     "spec-example" spec-example-reply))
 
